@@ -1,0 +1,159 @@
+*   {
+    box-sizing: border-box;
+}
+.btn {
+    border-radius: 5px;
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid black;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*     Modal     */
+.modal {
+    visibility: hidden;
+
+    position: fixed;
+    z-index: 999;
+
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* opacity: 0.5;
+    background: cornflowerblue; */
+}
+
+.modal-inner {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid red;
+    background: white;
+    padding: 30px;
+    opacity: 0.999;
+}
+
+.modal-btns {
+    display: flex;
+    justify-content: end;
+}
+.btn--modal--ok {
+    background: green;
+}
+.btn--modal--cancel {
+    background: grey;
+}
+.btn--modal--delete {
+    background: red;
+}
+
+ /*      Header      */
+.header {
+    width: 100%;
+}
+.title {
+    color: red;
+    font-size: larger;
+    font-weight: 500;
+}
+.header-inner {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+.header-left {
+    display: flex;
+}
+.btn-create {
+    border: 1px solid red;
+    background: gray;
+}
+
+.header-right {
+    display: flex;
+}
+.btn-filter {
+    border: 1px solid red;
+    background: brown;
+}
+.btn-settings {
+    border: 1px solid red;
+    background: gray;
+}
+
+/* Field */
+.field {
+    width: 100%;
+}
+.field-inner {
+    width: 100%;
+    display: flex;
+}
+.board {
+    border: 1px solid black;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+
+    width: 300px;
+    height: 100%;
+    background: rgb(80, 78, 78);
+}
+.board:first-child {
+    margin-left: 0;
+}
+.board-header {
+    display: flex;
+    justify-content: space-between;
+}
+.board-title {
+    margin-bottom: 5px;
+    font-size: medium;
+}
+.board-btns {
+    display: flex;
+    justify-content: end;
+}
+.btn-delete-board {
+    opacity: 0.5;
+    background: blanchedalmond;
+}
+
+/****************
+    Task    
+*******************/
+
+.task {
+    border-radius: 5px;
+    width: 100%;
+    background: white;
+
+    padding: 5px;
+    margin: 10px 0;
+}
+.task--header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.task-title {
+    color: #110000;
+    margin: 5px;
+}
+.btn--task--delete {
+    background: grey;
+    /* opacity: 0.5; */
+}
+.btn--modal--task--delete {
+    background: red;
+}
+.task-content {
+    width: 100%;
+    margin: 5px;
+    opacity: 0.5;
+}

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    <div class="modal" id="modal-board-create">
+        <div class="modal-inner">
+            <label for="modal-text">Input new board's name</label> 
+            <input type="text" name="modal-text" id="modal-board-name">
+            <div class="modal-btns">
+                <div class="btn btn--modal--ok" onclick="createBoardFromModal(this)">Create</div>    
+                <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>        
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="modal-board-change">
+        <div class="modal-inner">
+            <label for="board-color">Choose a color</label> 
+            <input class="input--color" type="color" name="board-color" id="">
+            <div class="btn btn--modal--color--update" onclick="updateBoardColorFromModal(this)">Update Color</div>    
+            <div class="btn btn--modal--delete" onclick="deleteBoardFromModal(this)">Delete Board</div>    
+            <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>    
+        </div>
+    </div>
+    <div class="modal" id="modal-board-cancel-delete">
+        <div class="modal-inner">
+            <label>You can't delete not empty board</label> 
+            <div class="btn btn--modal--cancel" onclick="hideModal(this)">OK</div>    
+        </div>
+    </div>
+    <div class="modal" id="modal-task-create">
+        <div class="modal-inner">
+            <label for="modal-title">Input new task's title</label> 
+            <input type="text" name="modal-title" id="modal-task-title">
+            <label for="modal-text">Input new task's text</label> 
+            <input type="text" name="modal-text" id="modal-task-text">
+            <div class="modal-btns">
+                <div class="btn btn--task--create" onclick="createTaskFromModal(this)">Create</div>    
+                <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>        
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="modal-task-delete">
+        <div class="modal-inner">
+            <label>Are you sure you want to delete the task?</label> 
+            <div class="modal-btns">
+                <div class="btn btn--modal--task--delete" onclick="deleteTaskFromModal(this)">Delete</div>    
+                <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <section class="header">
+        <div class="title">Trello</div>
+        <div class="header-inner">
+            <div class="header-left">
+                <div class="btn btn-create" id="board-create">+</div>
+                <select name="view" id="view">
+                    <option value="view-board">board</option>
+                    <option value="view-calendar">calendar</option>
+                </select>
+                <div class="users">
+                    <div class="user"></div>
+                </div>    
+            </div>
+            <div class="header-right">
+                <div class="btn btn-filter">Filter</div>
+                <div class="btn btn-settings">Settings</div>
+            </div>    
+        </div>
+
+    </section><!-- Header -->
+    
+    <!-- Field     -->
+    <div class="field">
+        <div class="field-inner">
+            <!-- <div class="board" id="todo">
+                <div class="board-header">
+                    <div class="board-title">ToDo</div>
+                    <div class="board-btns">
+                        <div class="btn btn--board--change">...</div>
+                        <div class="btn btn-create">+</div>    
+                    </div>
+                </div>
+                <div class="task">
+                    <div class="task-title">title 1</div>
+                    <div class="task-content">content 1</div>
+                </div>
+                <div class="task">
+                    <div class="task-title">title 1</div>
+                    <div class="task-content">content 1</div>
+                </div>
+            </div>
+            <div class="board" id="in-progress">
+                <div class="board-header">
+                    <div class="board-title">In Progress</div>
+                    <div class="board-btns">
+                        <div class="btn btn--board--change">...</div>
+                        <div class="btn btn-create">+</div>    
+                    </div>
+                </div>
+                <div class="task">
+                    <div class="task--header">
+                        <div class="task-title">title 1</div>
+                        <div class="btn btn--task--delete">X</div>
+                    </div>
+                    <div class="task-content">content 1</div>
+                </div>
+            </div>
+            <div class="board" id="done">
+                <div class="board-header">
+                    <div class="board-title">Done</div>
+                    <div class="board-btns">
+                        <div class="btn btn--board--change">...</div>
+                        <div class="btn btn-create">+</div>    
+                    </div>
+                </div>
+                <div class="task">
+                    <div class="task-title">title 1</div>
+                    <div class="task-content">content 1</div>
+                </div>
+            </div> -->
+        </div><!-- field-inner     -->
+    </div><!-- Field     -->
+
+    <script src="./index.js"></script>
+</body>
+</html>
