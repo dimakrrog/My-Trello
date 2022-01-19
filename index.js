@@ -30,24 +30,28 @@ let updateBoardColorFromModal = (element) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     boardNames = JSON.parse(localStorage.getItem('board-names'))
-    boardColors = JSON.parse(localStorage.getItem('board-colors'))
     if (!boardNames) {
         boardNames = ["ToDo", "In Progress", "Done"]
+        localStorage.setItem('board-names',JSON.stringify(boardNames))
     }
+
+    boardColors = JSON.parse(localStorage.getItem('board-colors'))
     if (!boardColors) {
         boardColors = []
+    }
+
+    tasks = JSON.parse(localStorage.getItem('tasks'))
+    if (!tasks) {
+        tasks = [[],[],[]]
     }
 
     for (let board of boardNames) {
         createBoard(board)
     }
 
-    tasks = JSON.parse(localStorage.getItem('tasks'))
-    if (!tasks) {
-        tasks = []
-    }
+    console.log('',tasks)
     for (let index = 0; index < boardCount; index++) {
-        showTasks(index)        
+        createTasks(index)        
     }
 
 })
@@ -55,12 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let createBoardFromModal = (element) => {
     let modal = document.querySelector("#modal-board-create")
-    modal.style.visibility = 'hidden'
-
     let newBoardName = document.querySelector('#modal-board-name')
+
+    
+    modal.style.visibility = 'hidden'
 
     boardNames.push(newBoardName.value)
     localStorage.setItem('board-names', JSON.stringify(boardNames))
+    tasks[boardCount] = []
 
     createBoard(newBoardName.value)
 }
@@ -88,10 +94,9 @@ let createBoard = (boardName) => {
             </div>
         </div>
     `)
-    tasks[boardCount] = []
     
     boardCount++
-    tasks.length = boardCount
+    // tasks.length = boardCount
 }
 
 let showModalBoardChange = (element) => {
@@ -138,31 +143,52 @@ let showModalTaskCreate = (element) => {
 
     let modalId = document.querySelector('.btn--task--create')
         modalId.id = "modal-task-create*"+index
+        modalId.innerHTML = 'Create' 
+    document.querySelector('#modal-task-title').value = 'title'
+    document.querySelector('#modal-task-expired-date').value = 'expDate'
+    document.querySelector('#modal-task-description').value = 'description'
+    document.querySelector('#modal-task-tag').value = 'tag'
+
     document.querySelector('#modal-task-create').style.visibility = 'visible'
 }
 
 let createTaskFromModal = (element) => {
     let strs = element.id.split('*')
-    let index = Number(strs[1])
+    let boardNumber = Number(strs[1])
+    let taskNumber = Number(strs[2])
 
     let taskTitle = document.querySelector('#modal-task-title').value
-    let taskText = document.querySelector('#modal-task-text').value
-
-    if (taskTitle == "" || taskText == "") {
-        alert("Input task's title!!!")
-        return
-    }
+    let taskDate = document.querySelector('#modal-task-expired-date').value
+    let taskDescription = document.querySelector('#modal-task-description').value
+    let taskTag = document.querySelector('#modal-task-tag').value
+    // if (taskTitle == "" || taskText == "") {
+    //     alert("Input task's title!!!")
+    //     return
+    // }
 
     document.querySelector('#modal-task-create').style.visibility = 'hidden'
 
     let newTask = {
         title: taskTitle,
-        text: taskText
+        expDate: taskDate,
+        description: taskDescription,
+        tag: taskTag,
     }
 
-    tasks[index].push(newTask)
+    if (taskNumber == undefined) {
+        console.log('createTaskFromModal', 'undefined')
+        tasks[boardNumber].push(newTask)
+        createTask(boardNumber, tasks[boardNumber].length-1)
+    } else {
+        tasks[boardNumber][taskNumber] = newTask
+        let titleId = '#task\\*' + boardNumber + '\\*' + taskNumber + ' .task--header .task-title'
+        document.querySelector(titleId).innerHTML = taskTitle
+
+        let tagId = '#task\\*' + boardNumber + '\\*' + taskNumber + ' .task-tag'
+        document.querySelector(tagId).innerHTML = taskTag
+        console.log('createTaskFromModal', taskTitle, taskTag)
+    }
     localStorage.setItem('tasks', JSON.stringify(tasks))
-    showTask(index, tasks[index].length-1)
 }
 
 let deleteTaskFromModal = (element) => {
@@ -179,7 +205,6 @@ let deleteTaskFromModal = (element) => {
 
 let showModalTaskDelete = (element) => {
     let strs = element.id.split('*')
-    console.log('showModalTaskDelete',strs)
     let boardNumber = Number(strs[1])
     let index = Number(strs[2])
 
@@ -188,28 +213,45 @@ let showModalTaskDelete = (element) => {
     document.querySelector('#modal-task-delete').style.visibility = 'visible'
 }
 
-let showTask = (boardNumber, taskNumber) => {
+let createTask = (boardNumber, taskNumber) => {
     let task = tasks[boardNumber][taskNumber]
     console.log(boardNumber, taskNumber, task)
     let board = document.querySelector('#board\\*'+boardNumber)
     let taskId = 'task*'+boardNumber+'*'+taskNumber
     let btnDeleteId = 'btn-task-del*'+boardNumber+'*'+taskNumber
     board.insertAdjacentHTML('beforeend', `
-        <div class="task" id="${taskId}">
+        <div class="task" id="${taskId}" onclick="showTask(this)">
             <div class="task--header">
                 <div class="task-title">${task.title}</div>
                 <div class="btn btn--task--delete" onclick="showModalTaskDelete(this)" id="${btnDeleteId}">X</div>
             </div>
-            <div class="task-content">${task.text}</div>
+            <div class="task-tag">${task.tag}</div>
         </div>
     `)
 }
 
-let showTasks = (boardNumber) => {
+let createTasks = (boardNumber) => {
     console.log(boardNumber, tasks[boardNumber])
     for (let index = 0; index < tasks[boardNumber].length; index++) {
-        showTask(boardNumber, index)        
+        createTask(boardNumber, index)        
     }
+}
+
+let showTask = (element) => {
+    let strs = element.id.split('*')
+    let boardNumber = Number(strs[1])
+    let index = Number(strs[2])
+    let task = tasks[boardNumber][index]
+
+    document.querySelector('#modal-task-title').value = task.title
+    document.querySelector('#modal-task-expired-date').value = task.expDate
+    document.querySelector('#modal-task-description').value = task.description
+    document.querySelector('#modal-task-tag').value = task.tag
+    let modalId = document.querySelector('.btn--task--create')
+        modalId.id = "modal-task-delete*"+boardNumber+'*'+index
+        modalId.innerHTML = 'Update' 
+
+    document.querySelector('#modal-task-create').style.visibility = 'visible'
 }
 
 let hideModal = (element) => {
@@ -218,3 +260,4 @@ let hideModal = (element) => {
         modal.style.visibility = 'hidden'
     }
 }
+

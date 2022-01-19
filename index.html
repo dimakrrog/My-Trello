@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>My Trello</title>
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -16,6 +16,10 @@
                 <div class="btn btn--modal--ok" onclick="createBoardFromModal(this)">Create</div>    
                 <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>        
             </div>
+            <!-- <div style="color: red;">
+                Board with the name "Hi" already exists
+                Enter a different name and click "Create" button</p>
+            </div> -->
         </div>
     </div>
     <div class="modal" id="modal-board-change">
@@ -35,10 +39,19 @@
     </div>
     <div class="modal" id="modal-task-create">
         <div class="modal-inner">
-            <label for="modal-title">Input new task's title</label> 
+            <h3 class="modal-title">Create a new task</h3>
+            <label for="modal-title">Title</label> 
             <input type="text" name="modal-title" id="modal-task-title">
-            <label for="modal-text">Input new task's text</label> 
-            <input type="text" name="modal-text" id="modal-task-text">
+            
+            <label for="modal-expired-date">Expired date</label> 
+            <input type="date" name="modal-expired-date" id="modal-task-expired-date">
+            
+            <label for="modal-description">Description</label> 
+            <input type="textaria" name="modal-description" id="modal-task-description">
+            
+            <label for="modal-tag">Tag</label> 
+            <input type="text" name="modal-tag" id="modal-task-tag">
+            
             <div class="modal-btns">
                 <div class="btn btn--task--create" onclick="createTaskFromModal(this)">Create</div>    
                 <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>        
