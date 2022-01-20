@@ -16,10 +16,6 @@
                 <div class="btn btn--modal--ok" onclick="createBoardFromModal(this)">Create</div>    
                 <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>        
             </div>
-            <!-- <div style="color: red;">
-                Board with the name "Hi" already exists
-                Enter a different name and click "Create" button</p>
-            </div> -->
         </div>
     </div>
     <div class="modal" id="modal-board-change">
@@ -31,24 +27,17 @@
             <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>    
         </div>
     </div>
-    <div class="modal" id="modal-board-cancel-delete">
-        <div class="modal-inner">
-            <label>You can't delete not empty board</label> 
-            <div class="btn btn--modal--cancel" onclick="hideModal(this)">OK</div>    
-        </div>
-    </div>
     <div class="modal" id="modal-task-create">
         <div class="modal-inner">
             <h3 class="modal-title">Create a new task</h3>
             <label for="modal-title">Title</label> 
-            <input type="text" name="modal-title" id="modal-task-title">
+            <input type="text" name="modal-title" maxlength="20" id="modal-task-title">
             
             <label for="modal-expired-date">Expired date</label> 
             <input type="date" name="modal-expired-date" id="modal-task-expired-date">
             
             <label for="modal-description">Description</label> 
-            <input type="textaria" name="modal-description" id="modal-task-description">
-            
+            <textarea name="modal-description" maxlength="2000" id="modal-task-description"></textarea>
             <label for="modal-tag">Tag</label> 
             <input type="text" name="modal-tag" id="modal-task-tag">
             
@@ -65,6 +54,11 @@
                 <div class="btn btn--modal--task--delete" onclick="deleteTaskFromModal(this)">Delete</div>    
                 <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>
             </div>
+        </div>
+    </div>
+    <div class="modal" id="modal-error">
+        <div class="modal-inner">
+            <div class="btn btn--modal--ok" onclick="hideErrorModal(this)">OK</div>
         </div>
     </div>
 
@@ -143,5 +137,6 @@
     </div><!-- Field     -->
 
     <script src="./index.js"></script>
+    <!-- <script src="./index.js" type="module"></script> -->
 </body>
 </html>

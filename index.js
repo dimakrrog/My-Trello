@@ -23,7 +23,6 @@ let updateBoardColorFromModal = (element) => {
     hideModal(element)
 
     boardColors[index] = newColor
-    console.log('document.updateBoardColor', boardColors)
     localStorage.setItem('board-colors',JSON.stringify(boardColors))
 
 }
@@ -49,11 +48,10 @@ document.addEventListener('DOMContentLoaded', () => {
         createBoard(board)
     }
 
-    console.log('',tasks)
     for (let index = 0; index < boardCount; index++) {
         createTasks(index)        
     }
-
+    document.querySelector('#modal-task-delete').style.visibility = 'hidden'
 })
 
 
@@ -61,7 +59,10 @@ let createBoardFromModal = (element) => {
     let modal = document.querySelector("#modal-board-create")
     let newBoardName = document.querySelector('#modal-board-name')
 
-    
+    if (!validateBoardNameIsUnique(newBoardName.value)) {
+        return
+    }
+
     modal.style.visibility = 'hidden'
 
     boardNames.push(newBoardName.value)
@@ -112,18 +113,15 @@ let showModalBoardChange = (element) => {
     document.querySelector('#modal-board-change').style.visibility = 'visible'
 }
 
-let showModalCancelDeleteBoard = () => {
-    document.querySelector('#modal-board-cancel-delete').style.visibility = 'visible'
-}
-
 let deleteBoardFromModal = (element) => {
     let strs = element.id.split('*')
     let index = Number(strs[1])
 
-    if (tasks[index].length) {
-        
-        showModalCancelDeleteBoard()
+    if (!validateBoardIsEmpty(index)) {
         return 
+    }
+    if (!validateBoardIsNonRemovable(index)) {
+        return
     }
 
     let deleteBoardId = '#board\\*'+index
@@ -141,6 +139,9 @@ let showModalTaskCreate = (element) => {
     let strs = element.id.split('*')
     let index = Number(strs[1])
 
+    if (!validateTaskCount(index))
+        return
+    
     let modalId = document.querySelector('.btn--task--create')
         modalId.id = "modal-task-create*"+index
         modalId.innerHTML = 'Create' 
@@ -161,12 +162,10 @@ let createTaskFromModal = (element) => {
     let taskDate = document.querySelector('#modal-task-expired-date').value
     let taskDescription = document.querySelector('#modal-task-description').value
     let taskTag = document.querySelector('#modal-task-tag').value
-    // if (taskTitle == "" || taskText == "") {
-    //     alert("Input task's title!!!")
-    //     return
-    // }
 
-    document.querySelector('#modal-task-create').style.visibility = 'hidden'
+    if (!validateTaskExpired(taskDate)) {
+        return
+    }
 
     let newTask = {
         title: taskTitle,
@@ -175,8 +174,13 @@ let createTaskFromModal = (element) => {
         tag: taskTag,
     }
 
-    if (taskNumber == undefined) {
-        console.log('createTaskFromModal', 'undefined')
+    if (!validateTaskEmptyField(newTask)) {
+        return
+    }
+
+    document.querySelector('#modal-task-create').style.visibility = 'hidden'
+
+    if (isNaN(taskNumber)) {
         tasks[boardNumber].push(newTask)
         createTask(boardNumber, tasks[boardNumber].length-1)
     } else {
@@ -186,7 +190,6 @@ let createTaskFromModal = (element) => {
 
         let tagId = '#task\\*' + boardNumber + '\\*' + taskNumber + ' .task-tag'
         document.querySelector(tagId).innerHTML = taskTag
-        console.log('createTaskFromModal', taskTitle, taskTag)
     }
     localStorage.setItem('tasks', JSON.stringify(tasks))
 }
@@ -215,7 +218,6 @@ let showModalTaskDelete = (element) => {
 
 let createTask = (boardNumber, taskNumber) => {
     let task = tasks[boardNumber][taskNumber]
-    console.log(boardNumber, taskNumber, task)
     let board = document.querySelector('#board\\*'+boardNumber)
     let taskId = 'task*'+boardNumber+'*'+taskNumber
     let btnDeleteId = 'btn-task-del*'+boardNumber+'*'+taskNumber
@@ -231,7 +233,6 @@ let createTask = (boardNumber, taskNumber) => {
 }
 
 let createTasks = (boardNumber) => {
-    console.log(boardNumber, tasks[boardNumber])
     for (let index = 0; index < tasks[boardNumber].length; index++) {
         createTask(boardNumber, index)        
     }
@@ -251,7 +252,8 @@ let showTask = (element) => {
         modalId.id = "modal-task-delete*"+boardNumber+'*'+index
         modalId.innerHTML = 'Update' 
 
-    document.querySelector('#modal-task-create').style.visibility = 'visible'
+    if (document.querySelector('#modal-task-delete').style.visibility == 'hidden')
+        document.querySelector('#modal-task-create').style.visibility = 'visible'
 }
 
 let hideModal = (element) => {
@@ -261,3 +263,104 @@ let hideModal = (element) => {
     }
 }
 
+let hideErrorModal = () => {
+    document.querySelector('#modal-error').style.visibility = 'hidden'
+    document.querySelector('#modal-error .modal-inner').innerHTML = '<div class="btn btn--modal--ok" onclick="hideErrorModal(this)">OK</div>'
+}
+
+let validateBoardNameIsUnique = (newBoardName) => {
+    for (const boardName of boardNames) {
+        if (newBoardName === boardName) {
+            document.querySelector('#modal-error').style.visibility = 'visible'
+            document.querySelector('#modal-error .modal-inner').insertAdjacentHTML('afterbegin', `
+                <div style="color: red;">
+                    Board with the name "${newBoardName.value}" already exists
+                    Enter a different name and click "Create" button
+                </div>
+            `)
+            return false
+        }
+    }
+    return true
+}
+
+let validateBoardIsEmpty = (boardId) => {
+    if (tasks[boardId].length > 0) {
+        document.querySelector('#modal-error').style.visibility = 'visible'
+        document.querySelector('#modal-error .modal-inner').insertAdjacentHTML('afterbegin', `
+            <div style="color: red;">
+                You can't delete not empty board!
+            </div>
+        `)
+    
+        return false
+    }
+
+    return  true
+}
+
+let validateBoardIsNonRemovable = (boardId) => {
+    if ( boardId < 3) {
+        document.querySelector('#modal-error').style.visibility = 'visible'
+        document.querySelector('#modal-error .modal-inner').insertAdjacentHTML('afterbegin', `
+            <div style="color: red;">
+                You can't delete non-removable board
+            </div>
+        `)
+    
+        return false
+    }
+
+    return  true
+}
+
+let validateTaskCount = (boardId) => {
+    if (tasks[boardId].length >= 3) {
+        document.querySelector('#modal-error').style.visibility = 'visible'
+        document.querySelector('#modal-error .modal-inner').insertAdjacentHTML('afterbegin', `
+            <div style="color: red;">
+                You have reached the maximum number of tasks for the board "${boardNames[boardId]}"
+            </div>
+        `)
+    
+        return false
+    }
+
+    return  true
+}
+
+let validateTaskExpired = (date) => {
+    dateNow = new Date()
+    dateExpired = new Date(date)
+    if (dateExpired < dateNow) {
+        document.querySelector('#modal-error').style.visibility = 'visible'
+        document.querySelector('#modal-error .modal-inner').insertAdjacentHTML('afterbegin', `
+            <div style="color: red;">
+                The expired date cannot be earlier than the current date
+            </div>
+        `)
+    
+        return false
+    }
+
+    return  true
+}
+
+let validateTaskEmptyField = (object) => {
+    for (const key in object) {
+        if (Object.hasOwnProperty.call(object, key)) {
+            const element = object[key];
+            if (element == "") {
+                document.querySelector('#modal-error').style.visibility = 'visible'
+                document.querySelector('#modal-error .modal-inner').insertAdjacentHTML('afterbegin', `
+                    <div style="color: red;">
+                    All fields are required
+                    </div>
+                `)
+            
+                return false        
+            }
+        }
+    }
+    return  true
+}
