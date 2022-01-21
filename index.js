@@ -2,6 +2,7 @@ let boardNames = []
 let boardColors = []
 let boardCount = 0
 let tasks = []
+let users = []
 
 let field = document.querySelector('.field-inner')
 
@@ -27,7 +28,7 @@ let updateBoardColorFromModal = (element) => {
 
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     boardNames = JSON.parse(localStorage.getItem('board-names'))
     if (!boardNames) {
         boardNames = ["ToDo", "In Progress", "Done"]
@@ -44,6 +45,15 @@ document.addEventListener('DOMContentLoaded', () => {
         tasks = [[],[],[]]
     }
 
+    // localStorage.removeItem('users')
+    users = JSON.parse(localStorage.getItem('users'))
+    if (!users) {
+        users = []
+        for (let index = 0; index < 5; index++) {
+            await getRandomUser()
+        }
+    }
+
     for (let board of boardNames) {
         createBoard(board)
     }
@@ -51,10 +61,15 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let index = 0; index < boardCount; index++) {
         createTasks(index)        
     }
+
+    for (let index = 0; index < users.length; index++) {
+        createUser(index)                        
+        console.log(index)
+    }
     document.querySelector('#modal-task-delete').style.visibility = 'hidden'
 })
 
-
+////////////// Board 
 let createBoardFromModal = (element) => {
     let modal = document.querySelector("#modal-board-create")
     let newBoardName = document.querySelector('#modal-board-name')
@@ -135,6 +150,14 @@ let deleteBoardFromModal = (element) => {
         localStorage.setItem('board-names', JSON.stringify(boardNames))
 }
 
+/////////// Task
+let userChange = () => {
+    let userSelector = document.querySelector('#modal-task-user')
+    document.querySelector('#modal-task-user-pic').src = users[+userSelector.value].picture.medium
+}
+let userSelestorChange = document.querySelector('#modal-task-user')
+userSelestorChange.addEventListener('change', userChange)
+
 let showModalTaskCreate = (element) => {
     let strs = element.id.split('*')
     let index = Number(strs[1])
@@ -149,8 +172,16 @@ let showModalTaskCreate = (element) => {
     document.querySelector('#modal-task-expired-date').value = 'expDate'
     document.querySelector('#modal-task-description').value = 'description'
     document.querySelector('#modal-task-tag').value = 'tag'
-
     document.querySelector('#modal-task-create').style.visibility = 'visible'
+    let userSelector = document.querySelector('#modal-task-user')
+    userSelector.value = 0
+    userSelector.innerHTML = ""
+    for (let i = 0; i < users.length; i++) {
+        userSelector.insertAdjacentHTML('beforeend',`
+            <option value="${i}">${users[i].name.first} ${users[i].name.last}</option>
+        `)
+    }
+    document.querySelector('#modal-task-user-pic').src = users[+userSelector.value].picture.thumbnail
 }
 
 let createTaskFromModal = (element) => {
@@ -162,6 +193,7 @@ let createTaskFromModal = (element) => {
     let taskDate = document.querySelector('#modal-task-expired-date').value
     let taskDescription = document.querySelector('#modal-task-description').value
     let taskTag = document.querySelector('#modal-task-tag').value
+    let taskUser = document.querySelector('#modal-task-user').value
 
     if (!validateTaskExpired(taskDate)) {
         return
@@ -172,6 +204,7 @@ let createTaskFromModal = (element) => {
         expDate: taskDate,
         description: taskDescription,
         tag: taskTag,
+        user: taskUser,
     }
 
     if (!validateTaskEmptyField(newTask)) {
@@ -248,6 +281,16 @@ let showTask = (element) => {
     document.querySelector('#modal-task-expired-date').value = task.expDate
     document.querySelector('#modal-task-description').value = task.description
     document.querySelector('#modal-task-tag').value = task.tag
+    let userSelector = document.querySelector('#modal-task-user')
+        userSelector.innerHTML = ""
+        for (let i = 0; i < users.length; i++) {
+            userSelector.insertAdjacentHTML('beforeend',`
+                <option value="${i}">${users[i].name.first} ${users[i].name.last}</option>
+            `)
+        }
+        userSelector.value = task.user
+    document.querySelector('#modal-task-user-pic').src = users[task.user].picture.thumbnail
+
     let modalId = document.querySelector('.btn--task--create')
         modalId.id = "modal-task-delete*"+boardNumber+'*'+index
         modalId.innerHTML = 'Update' 
@@ -268,6 +311,7 @@ let hideErrorModal = () => {
     document.querySelector('#modal-error .modal-inner').innerHTML = '<div class="btn btn--modal--ok" onclick="hideErrorModal(this)">OK</div>'
 }
 
+////////////    Validation
 let validateBoardNameIsUnique = (newBoardName) => {
     for (const boardName of boardNames) {
         if (newBoardName === boardName) {
@@ -364,3 +408,109 @@ let validateTaskEmptyField = (object) => {
     }
     return  true
 }
+
+let validateUserMinCount = () => {
+    if (users.length == 1) {
+        document.querySelector('#modal-error').style.visibility = 'visible'
+        document.querySelector('#modal-error .modal-inner').insertAdjacentHTML('afterbegin', `
+            <div style="color: red;">
+                You cannot delete the last user
+            </div>
+        `)
+    
+        return false
+    }
+
+    return  true
+}
+
+let validateUserMaxCount = () => {
+    if (users.length == 10) {
+        document.querySelector('#modal-error').style.visibility = 'visible'
+        document.querySelector('#modal-error .modal-inner').insertAdjacentHTML('afterbegin', `
+            <div style="color: red;">
+                You cannot create more than 10 users
+            </div>
+        `)
+    
+        return false
+    }
+
+    return  true
+}
+///////   Users
+async function getRandomUser () {
+    const USER_URL = 'https://randomuser.me/api/'
+    let user = await fetch(USER_URL)        
+    let userJson = await user.json()
+    let newUser = {
+        gender: userJson.results[0].gender,
+        name: userJson.results[0].name,
+        picture: {
+            thumbnail: userJson.results[0].picture.thumbnail,
+            medium: userJson.results[0].picture.medium,
+        }
+    }
+    users.push(newUser)
+    console.log(newUser)
+
+    localStorage.setItem('users',JSON.stringify(users))
+}
+
+let createUser = (index) => {
+    let userId = 'user*'+index
+    let userBlock = document.querySelector('.users')
+    userBlock.insertAdjacentHTML('beforeend',`
+        <div class="user"  onclick="showModalUserShow(this)" id="${userId}">
+            <img src="${users[index].picture.thumbnail}" alt="">
+        </div>
+    `)
+}
+let showModalUserShow = (element) => {
+    let strs = element.id.split('*')
+    let index = Number(strs[1])
+
+    let modalId = document.querySelector('.btn--modal--user--delete')
+        modalId.id = "modal-user-delete*"+index
+    let userModal = document.querySelector('.user--show')
+    userModal.innerHTML = ""
+    userModal.insertAdjacentHTML('afterbegin',`
+        <img style="width: 100%;" src="${users[index].picture.medium}" alt="">
+        <div class="user--info">
+            <div>${users[index].name.first}, ${users[index].name.last}</div>
+            <div>${users[index].gender}</div>
+        </div>
+    `)
+    document.querySelector('#modal-user-show').style.visibility = 'visible'
+}
+
+let deleteUserFromModal = (element) => {
+    let strs = element.id.split('*')
+    let index = Number(strs[1])
+    console.log(strs)
+
+    if (!validateUserMinCount()) {
+        return
+    }
+    let deleteUserId = '#user\\*'+index
+    document.querySelector('#modal-user-show').style.visibility = 'hidden'
+    document.querySelector(deleteUserId).remove()
+    for (let i = index+1; i < users.length; i++) {
+        let oldId = '#user\\*' + i
+        let newId = 'user*' + (i - 1)
+        document.querySelector(oldId).id = newId
+    }
+    users.splice(index, 1)
+    console.log(users.length)
+    localStorage.setItem('users', JSON.stringify(users))
+}
+
+async function addUser () {
+    if (!validateUserMaxCount()) {
+        return
+    }
+    await getRandomUser()
+    createUser(users.length-1)
+}
+let btnUserCreate = document.querySelector('#user-create')
+btnUserCreate.addEventListener('click', addUser)

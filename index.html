@@ -38,9 +38,18 @@
             
             <label for="modal-description">Description</label> 
             <textarea name="modal-description" maxlength="2000" id="modal-task-description"></textarea>
+
             <label for="modal-tag">Tag</label> 
             <input type="text" name="modal-tag" id="modal-task-tag">
             
+            <label for="modal-user">User to assign</label> 
+            <select name="modal-user" id="modal-task-user">
+                <option value="Chess" style="background-image: url(./index.png);">Chess</option>
+                <option value="Football">Football</option>
+                <option value="Volleyball">Volleyball</option>
+            </select>
+            <img src="" alt="" id="modal-task-user-pic">
+        
             <div class="modal-btns">
                 <div class="btn btn--task--create" onclick="createTaskFromModal(this)">Create</div>    
                 <div class="btn btn--modal--cancel" onclick="hideModal(this)">Cancel</div>        
@@ -61,6 +70,17 @@
             <div class="btn btn--modal--ok" onclick="hideErrorModal(this)">OK</div>
         </div>
     </div>
+    <div class="modal" id="modal-user-show">
+        <div class="modal-inner">
+            <div class="user--show">
+                <!-- <img style="width: 100%;" src="" alt=""> -->
+            </div>
+            <div class="modal-btns">
+                <div class="btn btn--modal--user--delete" onclick="deleteUserFromModal(this)">Delete user</div>    
+                <div class="btn btn--modal--cancel" onclick="hideModal(this)">OK</div>        
+            </div>
+        </div>
+    </div>
 
     <!-- Header -->
     <section class="header">
@@ -73,7 +93,10 @@
                     <option value="view-calendar">calendar</option>
                 </select>
                 <div class="users">
-                    <div class="user"></div>
+                    <div class="btn btn-create" id="user-create">+</div>
+                    <div class="user">
+                        <img src="" alt="">
+                    </div>
                 </div>    
             </div>
             <div class="header-right">

@@ -17,7 +17,7 @@
     visibility: hidden;
 
     position: fixed;
-    z-index: 999;
+    z-index: 10;
 
     width: 100%;
     height: 100%;
@@ -51,7 +51,9 @@
 .btn--modal--delete {
     background: red;
 }
-
+#modal-error {
+    z-index: 20;
+}
  /*      Header      */
 .header {
     width: 100%;
@@ -72,6 +74,15 @@
 .btn-create {
     border: 1px solid red;
     background: gray;
+}
+.users {
+    display: flex;
+    border: 1px solid black;
+    padding: 2px;
+    margin-left: 3px;
+}
+.user {
+    margin-left: 3px;
 }
 
 .header-right {
@@ -156,4 +167,19 @@
     width: 100%;
     margin: 5px;
     opacity: 0.5;
+}
+
+/****************
+    User    
+*******************/
+.user--show {
+    display: flex;
+}
+.user--info {
+    width: 100%;
+    padding: 10px;
+}
+
+.btn--modal--user--delete {
+    background: red;
 }
