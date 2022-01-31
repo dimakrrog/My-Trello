@@ -134,7 +134,9 @@
     opacity: 0.5;
     background: blanchedalmond;
 }
-
+.board--inner {
+    padding-left: 0;
+}
 /****************
     Task    
 *******************/
@@ -146,6 +148,8 @@
 
     padding: 5px;
     margin: 10px 0;
+
+    list-style-type: none;
 }
 .task--header {
     display: flex;

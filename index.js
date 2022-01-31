@@ -28,6 +28,11 @@ let updateBoardColorFromModal = (element) => {
 
 }
 
+// drag & drop
+let tasksListElements
+let tasksListElement = []
+
+//////////////
 document.addEventListener('DOMContentLoaded', async () => {
     boardNames = JSON.parse(localStorage.getItem('board-names'))
     if (!boardNames) {
@@ -67,6 +72,87 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log(index)
     }
     document.querySelector('#modal-task-delete').style.visibility = 'hidden'
+
+    tasksListElements = document.querySelectorAll('.board')
+    for (let i = 0; i < tasksListElements.length; i++) {
+        tasksListElement.push(tasksListElements[i].querySelector(`ul`));
+        tasksListElement[i].addEventListener(`dragstart`, (evt) => {
+            evt.target.classList.add(`selected`);
+          })
+          
+        tasksListElement[i].addEventListener(`dragend`, (evt) => {
+            evt.target.classList.remove(`selected`);
+        })
+        
+        const getNextElement = (cursorPosition, currentElement) => {
+            // Получаем объект с размерами и координатами
+            const currentElementCoord = currentElement.getBoundingClientRect();
+            // Находим вертикальную координату центра текущего элемента
+            const currentElementCenter = currentElementCoord.y + currentElementCoord.height / 2;
+          
+            // Если курсор выше центра элемента, возвращаем текущий элемент
+            // В ином случае — следующий DOM-элемент
+            const nextElement = (cursorPosition < currentElementCenter) ?
+                currentElement :
+                currentElement.nextElementSibling;
+          
+            return nextElement;
+        }
+
+        let changeTasksIds = (el1, el2) => {
+            let strs = el1.id.split('*')
+            let boardNumber = Number(strs[1])
+            let id1 = Number(strs[2])
+            let id2
+            if (el2) {
+                strs = el2.id.split('*')
+                id2 = Number(strs[2]) - 1
+            } else {
+                id2 = tasks[boardNumber].length - 1
+                el2 = document.querySelector('#task\\*'+boardNumber+'\\*'+id2)
+            }
+            let task1Id = 'task*'+boardNumber+'*'+id2
+            let task2Id = 'task*'+boardNumber+'*'+id1
+            el1.id = task1Id
+            el2.id = task2Id
+
+            let tmpTask = tasks[boardNumber][id1]
+            tasks[boardNumber][id1] = tasks[boardNumber][id2]
+            tasks[boardNumber][id2] = tmpTask
+
+            localStorage.setItem('tasks', JSON.stringify(tasks))
+        }
+        
+        tasksListElement[i].addEventListener(`dragover`, (evt) => {
+            evt.preventDefault();
+          
+            const activeElement = tasksListElement[i].querySelector(`.selected`);
+            const currentElement = evt.target;
+            const isMoveable = activeElement !== currentElement &&
+              currentElement.classList.contains(`task`);
+          
+            if (!isMoveable) {
+              return;
+            }
+          
+            // evt.clientY — вертикальная координата курсора в момент,
+            // когда сработало событие
+            const nextElement = getNextElement(evt.clientY, currentElement);
+          
+            // Проверяем, нужно ли менять элементы местами
+            if (
+              nextElement && 
+              activeElement === nextElement.previousElementSibling ||
+              activeElement === nextElement
+            ) {
+              // Если нет, выходим из функции, чтобы избежать лишних изменений в DOM
+              return;
+            }
+          
+            tasksListElement[i].insertBefore(activeElement, nextElement);
+            changeTasksIds(activeElement, nextElement)
+        });
+    }
 })
 
 ////////////// Board 
@@ -109,7 +195,10 @@ let createBoard = (boardName) => {
                 <div class="btn btn-create" onclick="showModalTaskCreate(this)" id=${btnCreateId}>+</div>    
             </div>
         </div>
-    `)
+        <ul class="board--inner">
+                
+        </ul>
+`)
     
     boardCount++
     // tasks.length = boardCount
@@ -251,17 +340,17 @@ let showModalTaskDelete = (element) => {
 
 let createTask = (boardNumber, taskNumber) => {
     let task = tasks[boardNumber][taskNumber]
-    let board = document.querySelector('#board\\*'+boardNumber)
+    let board = document.querySelector('#board\\*'+boardNumber+' ul')
     let taskId = 'task*'+boardNumber+'*'+taskNumber
     let btnDeleteId = 'btn-task-del*'+boardNumber+'*'+taskNumber
     board.insertAdjacentHTML('beforeend', `
-        <div class="task" id="${taskId}" onclick="showTask(this)">
+        <li class="task" id="${taskId}" onclick="showTask(this)" draggable="true">
             <div class="task--header">
                 <div class="task-title">${task.title}</div>
                 <div class="btn btn--task--delete" onclick="showModalTaskDelete(this)" id="${btnDeleteId}">X</div>
             </div>
             <div class="task-tag">${task.tag}</div>
-        </div>
+        </li>
     `)
 }
 
@@ -359,7 +448,7 @@ let validateBoardIsNonRemovable = (boardId) => {
 }
 
 let validateTaskCount = (boardId) => {
-    if (tasks[boardId].length >= 3) {
+    if (tasks[boardId].length >= 10) {
         document.querySelector('#modal-error').style.visibility = 'visible'
         document.querySelector('#modal-error .modal-inner').insertAdjacentHTML('afterbegin', `
             <div style="color: red;">
@@ -466,6 +555,7 @@ let createUser = (index) => {
         </div>
     `)
 }
+
 let showModalUserShow = (element) => {
     let strs = element.id.split('*')
     let index = Number(strs[1])
@@ -514,3 +604,5 @@ async function addUser () {
 }
 let btnUserCreate = document.querySelector('#user-create')
 btnUserCreate.addEventListener('click', addUser)
+
+
